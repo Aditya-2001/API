@@ -1,0 +1,5 @@
+For API:
+    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' https://signup-api-2001.herokuapp.com/user/login
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' http://localhost:5000/user/login
