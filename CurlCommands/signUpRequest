@@ -1,0 +1,5 @@
+For API:
+    curl -X POST --data '{"email":"#@abc.com", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' https://signup-api-2001.herokuapp.com/user/signup
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' http://localhost:5000/user/signup

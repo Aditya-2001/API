@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from marshmallow import Schema, fields, ValidationError, pre_load
 from flask_api import FlaskAPI
+from flask_json import FlaskJSON, JsonError, json_response, as_json
 
 app = FlaskAPI(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
@@ -44,8 +45,8 @@ users_schema = UserSchema(many=True)
 def func():
     return render_template('home.html')
 
-@app.route("/user/signup",methods=['POST'])
-def signup():
+@app.route("/user/signup1",methods=['POST'])
+def signup1():
     if request.method=="POST":
         Email=request.form['email']
         fName=request.form['fName']
@@ -65,9 +66,34 @@ def signup():
         return "User Added"
     else:
         return "Invalid request"
-
-@app.route("/user/all")
+        
+@app.route("/user/all",methods=['GET'])
 def allusers():
     users=User.query.all()
     result=users_schema.dump(users)
-    return {"Users": result}
+    print(result)
+    return json_response(Users=result)
+
+json = FlaskJSON(app)
+@app.route("/user/signup",methods=['POST'])
+def signup():
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        fName=data['fName']
+        lName=data['lName']
+        Gender=data['gender']
+        Profession=data['profession']
+        Role=data['role']
+        Contact=int(data['contact'])
+        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+        db.session.add(post)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+        finally:
+            db.session.close()
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
+    return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)

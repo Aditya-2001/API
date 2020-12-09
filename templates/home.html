@@ -12,7 +12,7 @@
     <div class="container">
         <br>
         <h3>This API is just for SignUp Purpose. You can simply try signing up here.</h3>
-        <form action="/user/signup " method="POST">
+        <form action="/user/signup1 " method="POST">
             <div class="mb-3">
                 <label for="email" class="form-label">Email address</label>
                 <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" required>
@@ -50,5 +50,5 @@
 </body>
 
 </html>
-<!--curl -X POST -H 'Content-Type:application/json' http://127.0.0.1:5000/user/signup -d '{"email":"mario@gmail.com", "fName":"mario", "lName":"AGG", "gender":"male", "profession":"gamer", "role":"mario", "contact":"123"}-->
-<!--curl -X POST -F "email":"mario@gmail.com" -F "fName":"mario" -F "lName":"AGG" -F "gender":"male" -F "profession":"gamer" -F "role":"mario" -F "contact":"123" http://your-domain.com/page.php-->
+<!--curl -X POST -H 'Content-Type:application/json' http://localhost:5000/user/signup -d '{"email":"mario@gmail.com", "fName":"mario", "lName":"AGG", "gender":"male", "profession":"gamer", "role":"mario", "contact":"123"}'-->
+<!--curl -X POST -F "email":"mario@gmail.com" -F "fName":"mario" -F "lName":"AGG" -F "gender":"male" -F "profession":"gamer" -F "role":"mario" -F "contact":"123" http://localhost:5000/user/signup-->
