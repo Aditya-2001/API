@@ -19,6 +19,7 @@ class User(db.Model):
     Profession=db.Column(db.String(50), nullable=False)
     Role=db.Column(db.String(50), nullable=False)
     Contact=db.Column(db.Integer, nullable=False)
+    CompanyName=db.Column(db.String(50), nullable=False)
     datePosted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
         return 'User ' + str(self.id)
@@ -33,6 +34,7 @@ class UserSchema(Schema):
     Role=fields.Str()
     Contact=fields.Int()
     datePosted=fields.DateTime(dump_only=True)
+    CompanyName=fields.Str()
     Name = fields.Method("format_name", dump_only=True)
 
     def format_name(self, author):
@@ -55,7 +57,7 @@ def signup1():
         Profession=request.form['profession']
         Role=request.form['role']
         Contact=request.form['contact']
-        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName='Aditya')
         db.session.add(post)
         try:
             db.session.commit()
@@ -67,16 +69,15 @@ def signup1():
     else:
         return "Invalid request"
         
-@app.route("/user/all",methods=['GET'])
-def allusers():
-    users=User.query.all()
+@app.route("/user/all/<name>",methods=['GET'])
+def allusers(name):
+    users=User.query.filter_by(CompanyName=name)
     result=users_schema.dump(users)
-    print(result)
     return json_response(Users=result)
 
 json = FlaskJSON(app)
-@app.route("/user/signup",methods=['POST'])
-def signup():
+@app.route("/user/signup/<name>",methods=['POST'])
+def signup(name):
     data = request.get_json(force=True)
     try:
         Email=data['email']
@@ -86,7 +87,8 @@ def signup():
         Profession=data['profession']
         Role=data['role']
         Contact=int(data['contact'])
-        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+        CompanyName=name
+        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName)
         db.session.add(post)
         try:
             db.session.commit()
@@ -96,4 +98,4 @@ def signup():
             db.session.close()
     except (KeyError, TypeError, ValueError):
         raise JsonError(description='Invalid value')
-    return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+    return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName)

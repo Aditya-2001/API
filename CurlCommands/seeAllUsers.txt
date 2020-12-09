@@ -1,5 +1,5 @@
 For API: 
-    curl -X GET https://signup-api-2001.herokuapp.com/user/all
+    curl -X GET https://signup-api-2001.herokuapp.com/user/all/CompanyName
 
 For localhost: 
-    curl -X GET http://localhost:5000/user/all
+    curl -X GET http://localhost:5000/user/all/CompanyName
