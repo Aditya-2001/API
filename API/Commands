@@ -24,3 +24,10 @@ For API:
 
 For local Server:
     curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification/message
+
+*******ResetPassword*******
+For API:
+    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###", "company_name":"Aditya", "company_password":"Aditya"}' https://api-2001.herokuapp.com//user/ForgotPassword
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###", "company_name":"Aditya", "company_password":"Aditya"}' http://localhost:5000/user/ForgotPassword

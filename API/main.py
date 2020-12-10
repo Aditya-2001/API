@@ -171,3 +171,45 @@ def otpSend(message,email):
     msg.body = 'OTP for ' + str(message) + ' is: ' + str(otp)  
     mail.send(msg) 
     return str(otp)
+
+@app.route("/user/ForgotPassword1",methods=['POST'])
+def resetPassword1():
+    Email=request.form['email']
+    NewPassword=request.form['new_password']
+    post=User.query.filter_by(Email=Email, CompanyName='Aditya', CompanyPassword='Aditya').first()
+    try:
+        post.Password=NewPassword
+        try:
+            db.session.commit()
+            return "Password Changed"
+        except:
+            db.session.rollback()
+        finally:
+            db.session.close()
+        return "ERROR"
+    except:
+        return "ERROR"
+
+@app.route("/user/ForgotPassword",methods=['POST'])
+def resetPassword():
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        NewPassword=data['new_password']
+        CompanyName=data['company_name']
+        CompanyPassword=data['company_password']
+        post=User.query.filter_by(Email=Email, CompanyName=CompanyName, CompanyPassword=CompanyPassword).first()
+        try:
+            post.Password=NewPassword
+            try:
+                db.session.commit()
+                return json_response(Email=Email)
+            except:
+                db.session.rollback()
+            finally:
+                db.session.close()
+        except:
+            pass
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
+    return json_response(status=400)
