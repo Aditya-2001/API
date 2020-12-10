@@ -11,8 +11,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
 db=SQLAlchemy(app)
 
 class User(db.Model):
-    id=db.Column(db.Integer, primary_key=True)
+    id=db.Column(db.Integer, primary_key=True, unique=True)
     Email=db.Column(db.String(30), nullable=False)
+    Password=db.Column(db.String(50), nullable=False)
     FirstName=db.Column(db.String(50), nullable=False)
     LastName=db.Column(db.String(50), nullable=False)
     Gender=db.Column(db.String(10), nullable=False)
@@ -20,6 +21,7 @@ class User(db.Model):
     Role=db.Column(db.String(50), nullable=False)
     Contact=db.Column(db.Integer, nullable=False)
     CompanyName=db.Column(db.String(50), nullable=False)
+    CompanyPassword=db.Column(db.String(50), nullable=False)
     datePosted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
         return 'User ' + str(self.id)
@@ -27,6 +29,7 @@ class User(db.Model):
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     Email=fields.Str()
+    Password=fields.Str()
     FirstName=fields.Str()
     LastName=fields.Str()
     Gender=fields.Str()
@@ -35,6 +38,7 @@ class UserSchema(Schema):
     Contact=fields.Int()
     datePosted=fields.DateTime(dump_only=True)
     CompanyName=fields.Str()
+    CompanyPassword=fields.Str()
     Name = fields.Method("format_name", dump_only=True)
 
     def format_name(self, author):
@@ -51,13 +55,14 @@ def func():
 def signup1():
     if request.method=="POST":
         Email=request.form['email']
+        Password=request.form['password']
         fName=request.form['fName']
         lName=request.form['lName']
         Gender=request.form['gender']
         Profession=request.form['profession']
         Role=request.form['role']
         Contact=request.form['contact']
-        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName='Aditya')
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName='Aditya', CompanyPassword='Aditya')
         db.session.add(post)
         try:
             db.session.commit()
@@ -68,12 +73,6 @@ def signup1():
         return "User Added"
     else:
         return "Invalid request"
-        
-@app.route("/user/all/<name>",methods=['GET'])
-def allusers(name):
-    users=User.query.filter_by(CompanyName=name)
-    result=users_schema.dump(users)
-    return json_response(Users=result)
 
 json = FlaskJSON(app)
 @app.route("/user/signup/<name>",methods=['POST'])
@@ -81,14 +80,16 @@ def signup(name):
     data = request.get_json(force=True)
     try:
         Email=data['email']
+        Password=data['password']
         fName=data['fName']
         lName=data['lName']
         Gender=data['gender']
         Profession=data['profession']
         Role=data['role']
         Contact=int(data['contact'])
+        CompanyPassword=data['company_password']
         CompanyName=name
-        post=User(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName)
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName, CompanyPassword=CompanyPassword)
         db.session.add(post)
         try:
             db.session.commit()
@@ -97,5 +98,41 @@ def signup(name):
         finally:
             db.session.close()
     except (KeyError, TypeError, ValueError):
-        raise JsonError(description='Invalid value')
+        raise JsonError(description='Invalid value/ Email already registered')
     return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName)
+
+@app.route("/user/all/<name>/<password>",methods=['GET','POST'])
+def allusers(name,password):
+    users=User.query.filter_by(CompanyName=name, CompanyPassword=password)
+    result=users_schema.dump(users)
+    return json_response(Users=result)
+
+@app.route("/user/login1",methods=['POST'])
+def login1():
+    if request.method=="POST":
+        Email=request.form['email']
+        Password=request.form['password']
+        post=User.query.filter_by(Email=Email, Password=Password).first()
+        try:
+            ID=post.id
+            return "Login Success"
+        except:
+            return "Login Failed"
+    else:
+        return "Invalid request"
+
+@app.route("/user/login",methods=['POST'])
+def login():
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        Password=data['password']
+        post=User.query.filter_by(Email=Email, Password=Password).first()
+        try:
+            ID=post.id
+            return json_response(Email=Email)
+        except:
+            pass
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
+    return json_response(status=400)

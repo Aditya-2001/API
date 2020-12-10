@@ -1,0 +1,19 @@
+*******SIGNUP*******
+For API:
+    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1", "company_password":"Aditya"}' https://signup-api-2001.herokuapp.com/user/signup/CompanyName
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1", "company_password":"Aditya"}' http://localhost:5000/user/signup/CompanyName
+
+*******USERS*******
+For API: 
+    curl -X POST https://signup-api-2001.herokuapp.com/user/all/CompanyName/CompanyPassword
+
+For localhost: 
+    curl -X POST http://localhost:5000/user/all/CompanyName/CompanyPassword
+
+*******LOGIN*******
+For API:
+    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' https://signup-api-2001.herokuapp.com/user/login
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' http://localhost:5000/user/login
