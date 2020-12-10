@@ -17,3 +17,10 @@ For API:
 
 For local Server:
     curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' http://localhost:5000/user/login
+
+*******EmailVerificationOTP*******
+For API:
+    curl -X POST --data '{"email":"#@abc.com"}' https://api-2001.herokuapp.com//user/EmailVerification1
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification/message

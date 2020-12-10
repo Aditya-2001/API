@@ -5,10 +5,22 @@ from sqlalchemy.exc import IntegrityError
 from marshmallow import Schema, fields, ValidationError, pre_load
 from flask_api import FlaskAPI
 from flask_json import FlaskJSON, JsonError, json_response, as_json
+from flask_mail import *  
+from random import *
 
 app = FlaskAPI(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
 db=SQLAlchemy(app)
+
+mail = Mail(app)  
+app.config["MAIL_SERVER"]='smtp.gmail.com'  
+app.config["MAIL_PORT"] = 465      
+app.config["MAIL_USERNAME"] = ''  
+app.config['MAIL_PASSWORD'] = ''  
+app.config['MAIL_USE_TLS'] = False  
+app.config['MAIL_USE_SSL'] = True  
+
+mail = Mail(app)  
 
 class User(db.Model):
     id=db.Column(db.Integer, primary_key=True, unique=True)
@@ -136,3 +148,26 @@ def login():
     except (KeyError, TypeError, ValueError):
         raise JsonError(description='Invalid value')
     return json_response(status=400)
+
+@app.route("/user/EmailVerification1",methods=['POST'])
+def emailVerify1():
+    email = request.form["email"]   
+    return otpSend("email verification: ",email)
+
+@app.route("/user/EmailVerification/<message>",methods=['POST'])
+def emailVerify(message):
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        otp=otpSend(message,Email)
+        return json_response(status=200, OTP=otp)
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
+    return json_response(status=400)
+
+def otpSend(message,email):
+    otp = randint(000000,999999)
+    msg = Message('OTP',sender = '', recipients = [email])  
+    msg.body = 'OTP for ' + str(message) + ' is: ' + str(otp)  
+    mail.send(msg) 
+    return str(otp)
