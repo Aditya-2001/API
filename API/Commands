@@ -1,15 +1,15 @@
 *******SIGNUP*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1", "company_password":"Aditya"}' https://api-2001.herokuapp.com//user/signup/CompanyName
+    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' https://api-2001.herokuapp.com//user/signup
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1", "company_password":"Aditya"}' http://localhost:5000/user/signup/CompanyName
+    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' http://localhost:5000/user/signup
 
 *******USERS*******
 For API: 
-    curl -X POST https://api-2001.herokuapp.com//user/all/CompanyName/CompanyPassword
+    curl -X POST https://api-2001.herokuapp.com//user/all
 
 For localhost: 
-    curl -X POST http://localhost:5000/user/all/CompanyName/CompanyPassword
+    curl -X POST http://localhost:5000/user/all
 
 *******LOGIN*******
 For API:
@@ -23,11 +23,11 @@ For API:
     curl -X POST --data '{"email":"#@abc.com"}' https://api-2001.herokuapp.com//user/EmailVerification1
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification/message
+    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification
 
 *******ResetPassword*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###", "company_name":"Aditya", "company_password":"Aditya"}' https://api-2001.herokuapp.com//user/ForgotPassword
+    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###"}' https://api-2001.herokuapp.com//user/ForgotPassword
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###", "company_name":"Aditya", "company_password":"Aditya"}' http://localhost:5000/user/ForgotPassword
+    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###"}' http://localhost:5000/user/ForgotPassword
