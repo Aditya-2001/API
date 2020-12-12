@@ -45,20 +45,29 @@ class User(db.Model):
     authenticated = db.Column(db.Boolean, default=False)
     LastLogin = db.Column(db.String, nullable=False)
     LastLogout = db.Column(db.String, nullable=False)
-    
+    Active = db.Column(db.Boolean, default=False)
+
     def __repr__(self):
         return 'User ' + str(self.id)
-    def is_active(self):
-        return True
 
-    def get_id(self):
-        return self.email
+    def is_active(self):
+        return self.Active
+
+    def is_admin(self):
+        if self.Role=="Admin":
+            return True
+        return False
 
     def is_authenticated(self):
         return self.authenticated
 
-    def is_anonymous(self):
-        return False
+class UserOTP(db.Model):
+    id=db.Column(db.Integer, primary_key=True, unique=True)
+    Email=db.Column(db.String(30), nullable=False)
+    otp=db.Column(db.String(10), nullable=False)
+
+    def __repr__(self):
+        return str(self.id)
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -74,6 +83,7 @@ class UserSchema(Schema):
     authenticated=fields.Bool()
     LastLogin=fields.Str()
     LastLogout=fields.Str()
+    Active=fields.Bool()
     Name = fields.Method("format_name", dump_only=True)
 
     def format_name(self, author):
@@ -103,7 +113,7 @@ def signup():
         Contact=int(data['contact'])
         now = datetime.now()
         date=now.strftime("%m/%d/%Y, %H:%M:%S")
-        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, LastLogin=date, LastLogout=date)
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, LastLogin=date, LastLogout=date, Active=True)
         db.session.add(post)
         CommitSession()
     except (KeyError, TypeError, ValueError):
@@ -180,18 +190,46 @@ def logout():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
-@app.route("/user/EmailVerification/<message>",methods=['POST'])
-def emailVerify(message):
+@app.route("/user/SendOTP",methods=['POST'])
+def SendOTP():
     data = request.get_json(force=True)
     try:
         Email=data['email']
-        otp=otpSend(message,Email)
-        return json_response(status=200, OTP=otp)
+        message=data['message']
+        otp=otp_sender(message,Email)
+        post=UserOTP.query.filter_by(Email=Email).first()
+        try:
+            post.otp=otp
+        except:
+            post=UserOTP(Email=Email, otp=otp)    
+        finally:
+            db.session.add(post)
+            CommitSession()  
+            return json_response(status=200)
     except (KeyError, TypeError, ValueError):
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
-def otpSend(message,email):
+@app.route("/user/EmailVerification",methods=['POST'])
+def EmailVerification():
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        senderOTP=data['otp']
+        post=UserOTP.query.filter_by(Email=Email).first()
+        try:
+            OriginalOTP=post.otp
+            if senderOTP==OriginalOTP:
+                return json_response(status=200)
+            else:
+                return json_response(status=400, Description="OTP does not matched")
+        except:
+            return json_response(status=400, Description="First send otp to this email")
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
+    return json_response(status=400)    
+
+def otp_sender(message,email):
     otp = randint(000000,999999)
     msg = Message('OTP',sender = 'djangonotification@gmail.com', recipients = [email])  
     msg.body = 'OTP for ' + str(message) + ' is: ' + str(otp)  

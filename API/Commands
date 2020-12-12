@@ -25,12 +25,19 @@ For API:
 For local Server:
     curl -X POST --data '{"email":"#@abcde.com"}' http://localhost:5000/user/logout
 
-*******EmailVerificationOTP*******
+*******SendOTP*******
 For API:
-    curl -X POST --data '{"email":"#@abcde.com"}' https://api-2001.herokuapp.com//user/EmailVerification/Message
+    curl -X POST --data '{"email":"#@abcde.com", "message":"message of otp"}' https://api-2001.herokuapp.com//user/SendOTP
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification/Message
+    curl -X POST --data '{"email":"#@abc.com", "message":"message of otp"}' http://localhost:5000/user/SendOTP
+
+*******EmailVerification*******
+For API:
+    curl -X POST --data '{"email":"#@abcde.com", "otp":"123456"}' https://api-2001.herokuapp.com//user/EmailVerification
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com", "otp":"enter ur otp"}' http://localhost:5000/user/EmailVerification
 
 *******ResetPassword*******
 For API:
