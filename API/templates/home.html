@@ -15,6 +15,7 @@
         <p style="text-align: center;">It will be removed after final API is created.</p> 
         <p style="text-align: center;">Anyone can try how it is working by filling the given forms.</p>
         <p style="text-align: center;">If you login using form then logged in as {{g.user.Email}}</p>
+        <p style="text-align: center;">Ha Ha Ha Ha Ha!! You can't fill this form, I removed the form testing now request will come from extenal source</p>
         <hr><hr>
         <form action="/user/signup1 " method="POST">
             <div class="mb-3">
@@ -73,6 +74,15 @@
                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <button type="submit " class="btn btn-primary ">Send OTP for Verification</button>
+        </form>
+        <hr><hr>
+        <form action="/user/profile1" method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" required>
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <button type="submit " class="btn btn-primary ">See Profile</button>
         </form>
         <hr><hr>
         <form action="/user/ForgotPassword1" method="POST">

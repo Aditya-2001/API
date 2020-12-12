@@ -86,6 +86,28 @@ users_schema = UserSchema(many=True)
 def func():
     return render_template('home.html')
 
+@app.route("/user/signup1",methods=['POST'])
+def signup1():
+    if request.method=="POST":
+        Email=request.form['email']
+        if duplicate(Email)==False:
+            return "Email already registered"
+        Password=request.form['password']
+        fName=request.form['fName']
+        lName=request.form['lName']
+        Gender=request.form['gender']
+        Profession=request.form['profession']
+        Role=request.form['role']
+        Contact=request.form['contact']
+        now = datetime.now()
+        date=now.strftime("%m/%d/%Y, %H:%M:%S")
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, LastLogin=date, LastLogout=date)
+        db.session.add(post)
+        CommitSession()
+        return "User Added"
+    else:
+        return "Invalid request"
+
 json = FlaskJSON(app)
 @app.route("/user/signup",methods=['POST'])
 def signup():
@@ -134,6 +156,31 @@ def allusers():
     result=users_schema.dump(users)
     return json_response(Users=result)
 
+
+@app.route("/user/login1",methods=['POST'])
+def login1():
+    if request.method=="POST":
+        session.pop('user_id', None)
+        Email=request.form['email']
+        Password=request.form['password']
+        post=User.query.filter_by(Email=Email, Password=Password).first()
+        try:
+            ID=post.id
+            now=datetime.now()
+            date=now.strftime("%m/%d/%Y, %H:%M:%S")
+            post.LastLogin=date
+            if post.authenticated==True:
+                post.LastLogout=date
+            post.authenticated=True
+            session['user_id'] = post.id
+            db.session.add(post)
+            CommitSession()
+            return "Login Success"
+        except:
+            return "Login Failed"
+    else:
+        return "Invalid request"
+
 @app.route("/user/login",methods=['POST'])
 def login():
     data = request.get_json(force=True)
@@ -158,6 +205,26 @@ def login():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
+@app.route("/user/logout1",methods=['POST','GET'])
+def logout1():
+    now=datetime.now()
+    date=now.strftime("%m/%d/%Y, %H:%M:%S")
+    if g.user == None:
+        return json_response(status=400, Description="Already Logged out")
+    user_id=g.user.id
+    g.user.authenticated=False
+    g.user.LastLogout=date
+    db.session.add(g.user)
+    try:
+        db.session.commit()
+        session.pop('user_id', None)
+        return json_response(status=200, Authenticated=False)
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return json_response(status=400)
+
 @app.route("/user/logout",methods=['POST','GET'])
 def logout():
     data = request.get_json(force=True)
@@ -180,6 +247,12 @@ def logout():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
+
+@app.route("/user/EmailVerification1",methods=['POST'])
+def emailVerify1():
+    email = request.form["email"]   
+    return otpSend("email verification: ",email)
+
 @app.route("/user/EmailVerification/<message>",methods=['POST'])
 def emailVerify(message):
     data = request.get_json(force=True)
@@ -197,6 +270,24 @@ def otpSend(message,email):
     msg.body = 'OTP for ' + str(message) + ' is: ' + str(otp)  
     mail.send(msg) 
     return str(otp)
+
+@app.route("/user/ForgotPassword1",methods=['POST'])
+def resetPassword1():
+    Email=request.form['email']
+    NewPassword=request.form['new_password']
+    post=User.query.filter_by(Email=Email).first()
+    try:
+        post.Password=NewPassword
+        try:
+            db.session.commit()
+            return "Password Changed"
+        except:
+            db.session.rollback()
+        finally:
+            db.session.close()
+        return "ERROR"
+    except:
+        return "ERROR"
 
 @app.route("/user/ForgotPassword",methods=['POST'])
 def resetPassword():
@@ -220,6 +311,17 @@ def resetPassword():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
+@app.route("/user/profile1",methods=['POST'])
+def profile1():
+    Email=request.form['email']
+    user=User.query.filter_by(Email=Email).first()
+    try:
+        id=user.id
+        user.Password="Can't be displayed"
+        result=user_schema.dump(user)
+        return json_response(User=result)
+    except:
+        return "ERROR"
 
 @app.route("/user/profile",methods=['POST'])
 def profile():

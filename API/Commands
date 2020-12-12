@@ -1,8 +1,8 @@
 *******SIGNUP*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' https://api-2001.herokuapp.com//user/signup
+    curl -X POST --data '{"email":"#@abcde.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' https://api-2001.herokuapp.com//user/signup
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' http://localhost:5000/user/signup
+    curl -X POST --data '{"email":"#@abcde.com","password":"123", "fName":"#", "lName":"#", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' http://localhost:5000/user/signup
 
 *******USERS*******
 For API: 
@@ -13,28 +13,43 @@ For localhost:
 
 *******LOGIN*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' https://api-2001.herokuapp.com//user/login
+    curl -X POST --data '{"email":"#@abcde.com",  "password":"123"}' https://api-2001.herokuapp.com//user/login
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com",  "password":"123"}' http://localhost:5000/user/login
+    curl -X POST --data '{"email":"#@abcde.com",  "password":"123"}' http://localhost:5000/user/login
 
 *******LOGOUT*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com"}' https://api-2001.herokuapp.com//user/logout
+    curl -X POST --data '{"email":"#@abcde.com"}' https://api-2001.herokuapp.com//user/logout
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/logout
+    curl -X POST --data '{"email":"#@abcde.com"}' http://localhost:5000/user/logout
 
 *******EmailVerificationOTP*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com"}' https://api-2001.herokuapp.com//user/EmailVerification1
+    curl -X POST --data '{"email":"#@abcde.com"}' https://api-2001.herokuapp.com//user/EmailVerification/Message
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification
+    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/EmailVerification/Message
 
 *******ResetPassword*******
 For API:
-    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###"}' https://api-2001.herokuapp.com//user/ForgotPassword
+    curl -X POST --data '{"email":"#@abcde.com",  "new_password":"###"}' https://api-2001.herokuapp.com//user/ForgotPassword
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com",  "new_password":"###"}' http://localhost:5000/user/ForgotPassword
+    curl -X POST --data '{"email":"#@abcde.com",  "new_password":"###"}' http://localhost:5000/user/ForgotPassword
+
+
+*******Profile*******
+For API:
+    curl -X POST --data '{"email":"#@abcde.com"}' https://api-2001.herokuapp.com//user/profile
+
+For local Server:
+    curl -X POST --data '{"email":"#@abcde.com"}' http://localhost:5000/user/profile
+
+*******Update Profile*******
+For API:
+    curl -X POST --data '{"email":"#@abcde.com", "fName":"##", "lName":"##", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' https://api-2001.herokuapp.com//user/updateprofile
+
+For local Server:
+    curl -X POST --data '{"email":"#@abcde.com", "fName":"##", "lName":"##", "gender":"#", "profession":"#", "role":"#", "contact":"1"}' http://localhost:5000/user/updateprofile
