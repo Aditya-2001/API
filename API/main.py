@@ -41,8 +41,11 @@ class User(db.Model):
     Profession=db.Column(db.String(50), nullable=False)
     Role=db.Column(db.String(50), nullable=False)
     Contact=db.Column(db.Integer, nullable=False)
-    datePosted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    datePosted=db.Column(db.DateTime, nullable=False, default=datetime.now)
     authenticated = db.Column(db.Boolean, default=False)
+    LastLogin = db.Column(db.String, nullable=False)
+    LastLogout = db.Column(db.String, nullable=False)
+    
     def __repr__(self):
         return 'User ' + str(self.id)
     def is_active(self):
@@ -69,6 +72,8 @@ class UserSchema(Schema):
     Contact=fields.Int()
     datePosted=fields.DateTime(dump_only=True)
     authenticated=fields.Bool()
+    LastLogin=fields.Str()
+    LastLogout=fields.Str()
     Name = fields.Method("format_name", dump_only=True)
 
     def format_name(self, author):
@@ -85,6 +90,8 @@ def func():
 def signup1():
     if request.method=="POST":
         Email=request.form['email']
+        if duplicate(Email)==False:
+            return "Email already registered"
         Password=request.form['password']
         fName=request.form['fName']
         lName=request.form['lName']
@@ -92,24 +99,23 @@ def signup1():
         Profession=request.form['profession']
         Role=request.form['role']
         Contact=request.form['contact']
-        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+        now = datetime.now()
+        date=now.strftime("%m/%d/%Y, %H:%M:%S")
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, LastLogin=date, LastLogout=date)
         db.session.add(post)
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-        finally:
-            db.session.close()
+        CommitSession()
         return "User Added"
     else:
         return "Invalid request"
 
 json = FlaskJSON(app)
 @app.route("/user/signup",methods=['POST'])
-def signup(name):
+def signup():
     data = request.get_json(force=True)
     try:
         Email=data['email']
+        if duplicate(Email)==False:
+            return json_response(description='Email already registered', status=400)
         Password=data['password']
         fName=data['fName']
         lName=data['lName']
@@ -117,17 +123,30 @@ def signup(name):
         Profession=data['profession']
         Role=data['role']
         Contact=int(data['contact'])
-        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+        now = datetime.now()
+        date=now.strftime("%m/%d/%Y, %H:%M:%S")
+        post=User(Email=Email, Password=Password, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, LastLogin=date, LastLogout=date)
         db.session.add(post)
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-        finally:
-            db.session.close()
+        CommitSession()
     except (KeyError, TypeError, ValueError):
-        raise JsonError(description='Invalid value/ Email already registered')
-    return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact, CompanyName=CompanyName)
+        raise JsonError(description='Invalid value')
+    return json_response(Email=Email, FirstName=fName, LastName=lName, Gender=Gender, Profession=Profession, Role=Role, Contact=Contact)
+
+def duplicate(Email):
+    post=User.query.filter_by(Email=Email).first()
+    try:
+        ID=post.id
+        return False
+    except:
+        return True
+    
+def CommitSession():
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
 
 @app.route("/user/all",methods=['GET','POST'])
 def allusers():
@@ -145,15 +164,15 @@ def login1():
         post=User.query.filter_by(Email=Email, Password=Password).first()
         try:
             ID=post.id
+            now=datetime.now()
+            date=now.strftime("%m/%d/%Y, %H:%M:%S")
+            post.LastLogin=date
+            if post.authenticated==True:
+                post.LastLogout=date
             post.authenticated=True
             session['user_id'] = post.id
             db.session.add(post)
-            try:
-                db.session.commit()
-            except:
-                db.session.rollback()
-            finally:
-                db.session.close()
+            CommitSession()
             return "Login Success"
         except:
             return "Login Failed"
@@ -163,22 +182,20 @@ def login1():
 @app.route("/user/login",methods=['POST'])
 def login():
     data = request.get_json(force=True)
-    session.pop('user_id', None)
     try:
         Email=data['email']
         Password=data['password']
         post=User.query.filter_by(Email=Email, Password=Password).first()
         try:
             ID=post.id
+            now=datetime.now()
+            date=now.strftime("%m/%d/%Y, %H:%M:%S")
+            post.LastLogin=date
+            if post.authenticated==True:
+                post.LastLogout=date
             post.authenticated=True
-            session['user_id'] = post.id
             db.session.add(post)
-            try:
-                db.session.commit()
-            except:
-                db.session.rollback()
-            finally:
-                db.session.close()
+            CommitSession()
             return json_response(Email=Email, Authenticated=True)
         except:
             pass
@@ -186,13 +203,15 @@ def login():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
-@app.route("/user/logout",methods=['POST','GET'])
-def logout():
-    print(g.user)
+@app.route("/user/logout1",methods=['POST','GET'])
+def logout1():
+    now=datetime.now()
+    date=now.strftime("%m/%d/%Y, %H:%M:%S")
     if g.user == None:
         return json_response(status=400, Description="Already Logged out")
     user_id=g.user.id
     g.user.authenticated=False
+    g.user.LastLogout=date
     db.session.add(g.user)
     try:
         db.session.commit()
@@ -202,6 +221,28 @@ def logout():
         db.session.rollback()
     finally:
         db.session.close()
+    return json_response(status=400)
+
+@app.route("/user/logout",methods=['POST','GET'])
+def logout():
+    data = request.get_json(force=True)
+    try:
+        Email=data['email']
+        post=User.query.filter_by(Email=Email).first()
+        try:
+            ID=post.id
+            if(post.authenticated):
+                now=datetime.now()
+                date=now.strftime("%m/%d/%Y, %H:%M:%S")
+                post.LastLogout=date
+            post.authenticated=False
+            db.session.add(post)
+            CommitSession()
+            return json_response(status=200, Email=Email, Authenticated=False)
+        except:
+            pass
+    except (KeyError, TypeError, ValueError):
+        raise JsonError(description='Invalid value')
     return json_response(status=400)
 
 

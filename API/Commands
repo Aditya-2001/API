@@ -16,7 +16,14 @@ For API:
     curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' https://api-2001.herokuapp.com//user/login
 
 For local Server:
-    curl -X POST --data '{"email":"#@abc.com",  "password":"###"}' http://localhost:5000/user/login
+    curl -X POST --data '{"email":"#@abc.com",  "password":"123"}' http://localhost:5000/user/login
+
+*******LOGOUT*******
+For API:
+    curl -X POST --data '{"email":"#@abc.com"}' https://api-2001.herokuapp.com//user/logout
+
+For local Server:
+    curl -X POST --data '{"email":"#@abc.com"}' http://localhost:5000/user/logout
 
 *******EmailVerificationOTP*******
 For API:
