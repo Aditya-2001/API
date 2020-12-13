@@ -94,7 +94,7 @@ users_schema = UserSchema(many=True)
 
 @app.route("/")
 def func():
-    return render_template('home.html')
+    return "WELCOME TO HOME SCREEN"
 
 json = FlaskJSON(app)
 @app.route("/user/signup",methods=['POST'])
@@ -168,7 +168,7 @@ def login():
         raise JsonError(description='Invalid value')
     return json_response(status=400)
 
-@app.route("/user/logout",methods=['POST','GET'])
+@app.route("/user/logout",methods=['POST'])
 def logout():
     data = request.get_json(force=True)
     try:
